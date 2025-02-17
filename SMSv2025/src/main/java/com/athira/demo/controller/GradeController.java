@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,7 @@ import com.athira.demo.common.APIResponse;
 import com.athira.demo.dto.ClassStudentsGradeSubjectDto;
 import com.athira.demo.entity.Grade;
 import com.athira.demo.service.IGradeService;
+import com.athira.demo.util.JwtUtils;
 
 @RestController
 @RequestMapping("api/")
@@ -26,12 +28,23 @@ public class GradeController {
 
 	@Autowired
 	IGradeService gradeService;
+	
+	@Autowired
+	JwtUtils jwtUtils;
 
 	// List all Grades
 	@GetMapping("grades")
-	public ResponseEntity<APIResponse> getAllGrades(Model model) {
+	public ResponseEntity<APIResponse> getAllGrades(Model model,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
+
 		try {
 			List<Grade> grades = gradeService.getAllGrades();
 			apiResponse.setStatus(200);
@@ -46,9 +59,17 @@ public class GradeController {
 
 	// Get Grades by id
 	@GetMapping("grades/{id}")
-	public ResponseEntity<APIResponse> getGradeById(@PathVariable Integer id) {
+	public ResponseEntity<APIResponse> getGradeById(@PathVariable Integer id,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
+		
 		try {
 			Optional<Grade> grade = gradeService.getGradeById(id);
 			apiResponse.setStatus(200);
@@ -64,9 +85,17 @@ public class GradeController {
 	// Get students report by class id
 
 	@GetMapping("grades/students/dto/{classId}")
-	public ResponseEntity<APIResponse> getStudentsReportByClassId(@PathVariable Integer classId) {
+	public ResponseEntity<APIResponse> getStudentsReportByClassId(@PathVariable Integer classId,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
+
 		try {
 			List<ClassStudentsGradeSubjectDto> reports = gradeService.getStudentsReportByClassId(classId);
 			apiResponse.setStatus(200);
@@ -81,9 +110,16 @@ public class GradeController {
 
 	// create a new Grade
 	@PostMapping("grades")
-	public ResponseEntity<APIResponse> createGrade(@RequestBody Grade grade) {
+	public ResponseEntity<APIResponse> createGrade(@RequestBody Grade grade,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 		try {
 			Grade gradeEntity = gradeService.saveGrade(grade);
 			apiResponse.setStatus(200);
@@ -98,8 +134,16 @@ public class GradeController {
 
 	// Edit and update Grade
 	@PutMapping("grades")
-	public ResponseEntity<APIResponse> editGrade(@RequestBody Grade grade) {
+	public ResponseEntity<APIResponse> editGrade(@RequestBody Grade grade,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
+
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 		try {
 			Grade gradeEntity = gradeService.saveGrade(grade);
 			apiResponse.setStatus(200);
@@ -114,8 +158,16 @@ public class GradeController {
 
 	// Delete Grade
 	@DeleteMapping("grades")
-	public ResponseEntity<APIResponse> deleteGrade(@RequestBody Grade grade) {
+	public ResponseEntity<APIResponse> deleteGrade(@RequestBody Grade grade,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
+
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 		try {
 			gradeService.deleteGrade(grade);
 			apiResponse.setStatus(200);

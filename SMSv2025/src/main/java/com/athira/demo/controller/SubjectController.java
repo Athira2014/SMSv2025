@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.athira.demo.common.APIResponse;
 import com.athira.demo.entity.Subject;
 import com.athira.demo.service.ISubjectService;
+import com.athira.demo.util.JwtUtils;
 
 @RestController
 @RequestMapping("api/")
@@ -24,6 +26,9 @@ public class SubjectController {
 
 	@Autowired
 	ISubjectService subjectService;
+	
+	@Autowired
+	JwtUtils jwtUtils;
 
 	// List all Subjects
 	@GetMapping("subjects")
@@ -49,7 +54,7 @@ public class SubjectController {
 		return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
 	}
 
-	// Get Subject by id
+	// Get Subject by name
 	@GetMapping("subjects/search/{name}")
 	public ResponseEntity<APIResponse> getSubjectByName(@PathVariable String name) {
 
@@ -69,10 +74,16 @@ public class SubjectController {
 
 	// Add Subjects
 	@PostMapping("subjects")
-	public ResponseEntity<APIResponse> addSubject(@RequestBody Subject subject) {
+	public ResponseEntity<APIResponse> addSubject(@RequestBody Subject subject,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
 
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 		try {
 			Subject subjectEntity = subjectService.saveSubject(subject);
 			apiResponse.setStatus(200);
@@ -88,9 +99,16 @@ public class SubjectController {
 
 	// Update Subject
 	@PutMapping("subjects")
-	public ResponseEntity<APIResponse> editSubject(@RequestBody Subject subject) {
+	public ResponseEntity<APIResponse> editSubject(@RequestBody Subject subject,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
+
 		APIResponse apiResponse = new APIResponse();
 
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 		try {
 			Subject subjectEntity = subjectService.saveSubject(subject);
 			apiResponse.setStatus(200);

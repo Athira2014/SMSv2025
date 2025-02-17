@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.athira.demo.common.APIResponse;
 import com.athira.demo.entity.Classes;
 import com.athira.demo.service.IClassesService;
+import com.athira.demo.util.JwtUtils;
 
 @RestController
 @RequestMapping("api/")
@@ -25,6 +27,9 @@ public class ClassesController {
 
 	@Autowired
 	IClassesService classesService;
+	
+	@Autowired
+	JwtUtils jwtUtils;
 
 	// List all classes
 	@GetMapping("classes")
@@ -84,10 +89,16 @@ public class ClassesController {
 
 	// Create a new class details
 	@PostMapping("classes")
-	public ResponseEntity<APIResponse> createNewClass(@RequestBody Classes classes) {
+	public ResponseEntity<APIResponse> createNewClass(@RequestBody Classes classes,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
 
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 		try {
 			Classes classesEntity = classesService.saveClasses(classes);
 			apiResponse.setStatus(200);
@@ -102,9 +113,16 @@ public class ClassesController {
 
 	// Update class details
 	@PutMapping("classes")
-	public ResponseEntity<APIResponse> updateAClass(@RequestBody Classes classes) {
+	public ResponseEntity<APIResponse> updateAClass(@RequestBody Classes classes,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 
 		try {
 			Classes classesEntity = classesService.saveClasses(classes);
@@ -121,9 +139,16 @@ public class ClassesController {
 	
 	// Delete class details
 	@DeleteMapping("classes")
-	public ResponseEntity<APIResponse> deleteAClass(@PathVariable Integer id) {
+	public ResponseEntity<APIResponse> deleteAClass(@PathVariable Integer id,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 
 		try {
 			classesService.deleteAClass(id);

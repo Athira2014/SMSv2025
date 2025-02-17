@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +19,7 @@ import com.athira.demo.common.APIResponse;
 import com.athira.demo.entity.Teacher;
 import com.athira.demo.service.ISubjectService;
 import com.athira.demo.service.ITeacherService;
+import com.athira.demo.util.JwtUtils;
 
 @RestController
 @RequestMapping("api/")
@@ -28,6 +30,9 @@ public class TeacherController {
 
 	@Autowired
 	ISubjectService subjectService;
+	
+	@Autowired
+	JwtUtils jwtUtils;
 
 	// List all Teachers
 	@GetMapping("teachers")
@@ -87,11 +92,18 @@ public class TeacherController {
 	}
 	
 
-	// get a Teacher
+	// get Teacher's summary
 	@GetMapping("teachers/teachersummary")
-	public ResponseEntity<APIResponse> getAllTeacherSummary() {
+	public ResponseEntity<APIResponse> getAllTeacherSummary(
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 
 		try {
 			List<Teacher> summary = teacherService.getAllTeacherSummary();
@@ -128,9 +140,16 @@ public class TeacherController {
 
 	// Add Teacher
 	@PostMapping("teachers")
-	public ResponseEntity<APIResponse> addTeacher(@RequestBody Teacher teacher) {
+	public ResponseEntity<APIResponse> addTeacher(@RequestBody Teacher teacher,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 
 		try {
 			Teacher teacherEntity = teacherService.saveTeacher(teacher);
@@ -147,10 +166,17 @@ public class TeacherController {
 
 	// Edit Teacher
 	@PutMapping("teachers")
-	public ResponseEntity<APIResponse> editTeacher(@RequestBody Teacher teacher) {
+	public ResponseEntity<APIResponse> editTeacher(@RequestBody Teacher teacher,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
 
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
+		
 		try {
 			Teacher teacherEntity = teacherService.saveTeacher(teacher);
 			apiResponse.setStatus(200);
@@ -166,10 +192,17 @@ public class TeacherController {
 
 	// INACTIVE Teacher
 	@DeleteMapping("teachers/disable/{id}")
-	public ResponseEntity<APIResponse> disableTeacher(@PathVariable int id) {
+	public ResponseEntity<APIResponse> disableTeacher(@PathVariable int id,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
 
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
+		
 		try {
 			teacherService.disableTeacher(id);
 			apiResponse.setStatus(200);

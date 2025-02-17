@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +19,7 @@ import com.athira.demo.common.APIResponse;
 import com.athira.demo.entity.Student;
 import com.athira.demo.service.IGradeService;
 import com.athira.demo.service.IStudentService;
+import com.athira.demo.util.JwtUtils;
 
 @RestController
 @RequestMapping("api/")
@@ -25,9 +27,12 @@ public class StudentController {
 
 	@Autowired
 	IStudentService studentService;
-	
+
 	@Autowired
 	IGradeService gradeService;
+
+	@Autowired
+	JwtUtils jwtUtils;
 
 	// List all students
 	@GetMapping("students")
@@ -65,9 +70,16 @@ public class StudentController {
 
 	// create a new student record
 	@PostMapping("students")
-	public ResponseEntity<APIResponse> addStudent(@RequestBody Student student) {
+	public ResponseEntity<APIResponse> addStudent(@RequestBody Student student,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 		try {
 			Student studentEntity = studentService.saveStudent(student);
 			apiResponse.setStatus(200);
@@ -82,9 +94,17 @@ public class StudentController {
 
 	// Update student record
 	@PutMapping("students")
-	public ResponseEntity<APIResponse> editStudent(@RequestBody Student student) {
+	public ResponseEntity<APIResponse> editStudent(@RequestBody Student student,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
+
 		try {
 			Student studentEntity = studentService.saveStudent(student);
 			apiResponse.setStatus(200);
@@ -99,9 +119,17 @@ public class StudentController {
 
 	// Disable student
 	@DeleteMapping("students/{id}")
-	public ResponseEntity<APIResponse> disableStudent(@PathVariable Integer id) {
+	public ResponseEntity<APIResponse> disableStudent(@PathVariable Integer id,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
+
 		try {
 			Student studentEntity = studentService.disableStudent(id);
 			apiResponse.setStatus(200);
@@ -113,12 +141,20 @@ public class StudentController {
 		}
 		return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
 	}
-	
+
 	// student report by student id
 	@GetMapping("students/report/{id}")
-	public ResponseEntity<APIResponse> getStudentReportById(@PathVariable Integer id) {
+	public ResponseEntity<APIResponse> getStudentReportById(@PathVariable Integer id,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
+
 		try {
 			Object[] report = studentService.getStudentReportById(id);
 			apiResponse.setStatus(200);
@@ -130,6 +166,5 @@ public class StudentController {
 		}
 		return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
 	}
-
 
 }

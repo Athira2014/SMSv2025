@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +19,7 @@ import com.athira.demo.common.APIResponse;
 import com.athira.demo.entity.Enrollment;
 import com.athira.demo.service.IEnrollmentService;
 import com.athira.demo.service.IGradeService;
+import com.athira.demo.util.JwtUtils;
 
 @RestController
 @RequestMapping("api/")
@@ -25,6 +27,9 @@ public class EnrollmentController {
 
 	@Autowired
 	IEnrollmentService enrollmentService;
+	
+	@Autowired
+	JwtUtils jwtUtils;
 	
 	// List all Enrollments
 	@GetMapping("enrollments")
@@ -40,9 +45,16 @@ public class EnrollmentController {
 	
 	//Add new Enrollment
 	@PostMapping("enrollments") 
-	public ResponseEntity<APIResponse> createEnrollment(@RequestBody Enrollment enrollment) { 
+	public ResponseEntity<APIResponse> createEnrollment(@RequestBody Enrollment enrollment,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
 
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 		try {
 			enrollmentService.createEnrollment(enrollment);
 			apiResponse.setStatus(200);
@@ -57,9 +69,16 @@ public class EnrollmentController {
 	
 	//Edit Enrollment
 	@PutMapping("enrollments") 
-	public ResponseEntity<APIResponse> editEnrollment(@RequestBody Enrollment enrollment) {
-		
+	public ResponseEntity<APIResponse> editEnrollment(@RequestBody Enrollment enrollment,
+			@RequestHeader(value = "authorization", defaultValue = "") String auth) {
+
 		APIResponse apiResponse = new APIResponse();
+
+		ResponseEntity<APIResponse> tokenVerificationResponse = jwtUtils.verifyToken(auth);
+
+		if (tokenVerificationResponse != null) {
+			return tokenVerificationResponse;
+		}
 		try {
 			Enrollment enrollmentEntity = enrollmentService.updateEnrollment(enrollment);
 			apiResponse.setStatus(200);

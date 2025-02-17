@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
@@ -45,21 +46,29 @@ public class Teacher {
 
 	@Column(name = "subId", nullable = false)
 	private Integer subId;
+	
+	@OneToOne
+    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    private User user;  
+	
+	@Column(name = "userId", nullable = false)
+    private Integer userId; 
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "teacher")
 	private List<Classes> classes;
 
 	public Teacher(Integer teacherId, String firstName, String lastName, DateTime joiningDate, String stillWorkingHere,
-			Subject subject, Integer subId) {
+			Integer subId, Integer userId, List<Classes> classes) {
 		super();
 		this.teacherId = teacherId;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.joiningDate = joiningDate;
 		this.stillWorkingHere = stillWorkingHere;
-		this.subject = subject;
 		this.subId = subId;
+		this.userId = userId;
+		this.classes = classes;
 	}
 
 	public Teacher() {
@@ -137,6 +146,23 @@ public class Teacher {
 	public Integer getSubId() {
 		return subId;
 	}
+	
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
 
 	public void setSubId(Integer subId) {
 		this.subId = subId;
@@ -145,8 +171,8 @@ public class Teacher {
 	@Override
 	public String toString() {
 		return "Teacher [teacherId=" + teacherId + ", firstName=" + firstName + ", lastName=" + lastName
-				+ ", joiningDate=" + joiningDate + ", stillWorkingHere=" + stillWorkingHere + ", subject=" + subject
-				+ ", subId=" + subId + ", classes=" + classes + "]";
+				+ ", joiningDate=" + joiningDate + ", stillWorkingHere=" + stillWorkingHere + ", subId=" + subId
+				+ ", userId=" + userId + ", classes=" + classes + "]";
 	}
 
 }
